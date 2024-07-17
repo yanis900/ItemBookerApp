@@ -1,11 +1,10 @@
-const container = document.getElementById("container");
-let itemIdCounter = 0;
+const items = document.getElementById("items");
 
 const addItem = () => {
   const newItem = document.createElement("div");
   newItem.classList.add("item");
   newItem.classList.add("item");
-  newItem.innerHTML = itemIdCounter;
+
   const deleteBtn = document.createElement("button");
   deleteBtn.textContent = "-";
   deleteBtn.classList.add("delete");
@@ -14,10 +13,9 @@ const addItem = () => {
   };
 
   newItem.appendChild(deleteBtn);
-  container.appendChild(newItem);
-  itemIdCounter++;
+  items.appendChild(newItem);
 };
 
 const removeItem = (item) => {
-  container.removeChild(item);
+  items.removeChild(item);
 };
