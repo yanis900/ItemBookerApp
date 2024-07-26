@@ -1,16 +1,13 @@
 * {
   box-sizing: border-box;
 }
-h1 {
+button {
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 5px 15px;
 }
-h2 {
-
-}
-h3 {
-}
-h1, h2, h3 {
-  margin: 0;
-  padding: 0;
+button:hover {
+  background: transparent;
 }
 .container {
   height: 100vh;
@@ -18,7 +15,7 @@ h1, h2, h3 {
   display: flex;
   padding: 10px;
   gap: 10px;
-  border: 1px solid lightgray;
+  background: lightgray;
 }
 .items {
   width: 50%;
@@ -29,12 +26,7 @@ h1, h2, h3 {
   gap: 10px;
   overflow: scroll;
   border: 1px solid black;
-}
-.bookings {
-  width: 50%;
-  height: 100%;
-  padding: 10px;
-  border: 1px solid black;
+  background: white;
 }
 .item {
   position: relative;
@@ -42,17 +34,21 @@ h1, h2, h3 {
   width: 100%;
   min-height: 150px;
   background-color: lightgray;
+  border: 1px solid black;
 }
 .item-props {
   width: 50%;
   height: 100%;
   padding: 10px;
   display: flex;
-  gap: 10px
+  gap: 10px;
 }
 .item-details {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  text-transform: uppercase;
+  font-weight: 800;
 }
 .item-id {
   height: fit-content;
@@ -61,21 +57,38 @@ h1, h2, h3 {
   border: 1px solid black;
 }
 .item-img {
-  aspect-ratio: 1;
   height: 100%;
+  width: 10rem;
   border: 1px solid black;
   background: #fff;
 }
-.add {
-  width: 40px;
-  height: 20px;
-  border-radius: 0;
-  cursor: pointer;
+.bookings {
+  width: 50%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid black;
 }
+.booking {
+  width: 100%;
+  height: 50%;
+  border: 1px solid black;
+  background: white;
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.search-input {
+  padding: 5px;
+}
+/* buttons */
 .delete {
   position: absolute;
   top: 10px;
   right: 10px;
-  border-radius: 0;
-  cursor: pointer;
 }

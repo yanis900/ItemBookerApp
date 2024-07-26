@@ -1,10 +1,13 @@
 class ItemManager {
-  constructor(containerId, addButtonId) {
-    this.container = document.getElementById(containerId);
+  constructor() {
+    this.container = document.getElementById("container");
     this.idCounter = 0;
     this.items = {};
 
-    document.getElementById(addButtonId).onclick = () => this.addItem();
+    document.getElementById("addItemButton").onclick = () => this.addItem();
+    document.getElementById("searchButton").onclick = () => this.search();
+    document.getElementById("showAllButton").onclick = () =>
+      this.showAllItems();
   }
 
   formatId(id) {
@@ -24,22 +27,23 @@ class ItemManager {
     const item = {
       id: this.idCounter,
       name: itemName,
+      booked: false,
     };
 
     this.items[this.idCounter] = item;
 
-    const newItem = this.createItemElement(item.id, item.name);
+    const newItem = this.createItemElement(item.id, item.name, item.booked);
     this.container.appendChild(newItem);
   }
 
-  createItemElement(id, name) {
+  createItemElement(id, name, booked) {
     const newItem = document.createElement("div");
     newItem.classList.add("item");
 
     const itemProps = document.createElement("div");
     itemProps.classList.add("item-props");
 
-    const itemImg = document.createElement("div");
+    const itemImg = document.createElement("img");
     itemImg.classList.add("item-img");
 
     const itemDetails = document.createElement("div");
@@ -55,13 +59,13 @@ class ItemManager {
 
     const itemState = document.createElement("div");
     itemState.classList.add("item-state");
-    itemState.textContent = "Status: Booked";
+    itemState.textContent = booked;
 
     const itemDate = document.createElement("div");
-    itemDate.textContent = "From: 20/07/24 /n To: 25/07/24";
+    itemDate.textContent = "undefined";
 
     const itemUpdate = document.createElement("div");
-    itemUpdate.textContent = "Due in 3 days";
+    itemUpdate.textContent = "undefined";
 
     const deleteBtn = document.createElement("button");
     deleteBtn.classList.add("delete");
@@ -109,13 +113,11 @@ class ItemManager {
 
       const deleteBtn = remainingItem.querySelector(".delete");
       deleteBtn.onclick = () => {
-        let youSure = confirm(
-          "Are you sure you want to delete this item?"
-        );
+        let youSure = confirm("Are you sure you want to delete this item?");
 
-        if (youSure == "n") {
+        if (!youSure) {
           return;
-        } else if (youSure == "y") {
+        } else {
           this.removeItem(remainingItem, newId);
         }
       };
@@ -126,6 +128,56 @@ class ItemManager {
 
     this.idCounter = newId - 1;
   }
+
+  search() {
+    const query = document.getElementById("searchInput").value.trim();
+    const searchResults = [];
+
+    if (query === "") {
+      alert("Search query cannot be empty");
+      return;
+    }
+
+    if (!isNaN(query)) {
+      const id = parseInt(query, 10);
+      if (this.items[id]) {
+        searchResults.push(this.items[id]);
+      }
+    } else {
+      for (const id in this.items) {
+        if (this.items[id].name.toLowerCase().includes(query.toLowerCase())) {
+          searchResults.push(this.items[id]);
+        }
+      }
+    }
+
+    this.displaySearchResults(searchResults);
+    document.getElementById("showAllButton").style.display = "inline";
+  }
+
+  showAllItems() {
+    const allItems = Object.values(this.items);
+    this.displaySearchResults(allItems);
+    document.getElementById("showAllButton").style.display = "none";
+  }
+
+  displaySearchResults(results) {
+    this.clearSearchResults();
+
+    results.forEach((item) => {
+      const newItem = this.createItemElement(item.id, item.name, item.booked);
+      this.container.appendChild(newItem);
+    });
+  }
+
+  clearSearchResults() {
+    const items = this.container.querySelectorAll(".item");
+    items.forEach((item) => {
+      if (!item.contains(document.getElementById("addItemButton"))) {
+        this.container.removeChild(item);
+      }
+    });
+  }
 }
 
-const itemManager = new ItemManager("container", "addItemButton");
+const itemManager = new ItemManager();

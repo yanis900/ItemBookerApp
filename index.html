@@ -5,28 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="index.css" />
     <title>Item Booker App</title>
+    <style>
+      #showAllButton {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
       <div class="items" id="container">
-        <button class="add" id="addItemButton">+</button>
-
-        <!-- ITEM PLACEHOLDER -->
+        <div class="search-bar">
+          <button class="add" id="addItemButton">+</button>
+          <input type="search" id="searchInput" class="search-input" />
+          <button class="search" id="searchButton">Search</button>
+          <button class="show-all" id="showAllButton">Show All</button>
+        </div>
         <div class="item">
           <div class="item-props">
-            <div class="item-img"></div>
+            <img class="item-img" src="/images/item.png" />
             <div class="item-details">
-              <div class="item-id">001</div>
-              <div class="item-name">John Smith</div>
-              <div class="item-state">Status: Booked</div>
-              <div class="item-date">From: 20/07/24 /n To: 25/07/24</div>
-              <div class="item-update">Due in 3 days</div>
+              <div class="item-id">000</div>
+              <div class="item-name">Example</div>
+              Add and remove a new item to remove me!
             </div>
             <button class="delete">-</button>
           </div>
         </div>
       </div>
-      <div class="bookings"></div>
+      <div class="bookings">
+        <div class="booking"></div>
+        <div class="booking"></div>
+      </div>
     </div>
     <script src="app.js"></script>
   </body>
