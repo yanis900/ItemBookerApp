@@ -4,6 +4,11 @@ class ItemManager {
     this.idCounter = 0;
     this.items = {};
 
+    this.loadItemsFromLocalStorage(); // Load items from local storage
+    this.initEventListeners();
+  }
+
+  initEventListeners() {
     document.getElementById("addItemButton").onclick = () => this.addItem();
     document.getElementById("searchButton").onclick = () => this.search();
     document.getElementById("showAllButton").onclick = () =>
@@ -14,31 +19,10 @@ class ItemManager {
     return id.toString().padStart(3, "0");
   }
 
-  addItem() {
-    const itemName = prompt("Enter item name");
-
-    if (itemName === null || itemName.trim() === "") {
-      alert("Item name cannot be empty");
-      return;
-    }
-
-    this.idCounter++;
-
-    const item = {
-      id: this.idCounter,
-      name: itemName,
-      booked: false,
-    };
-
-    this.items[this.idCounter] = item;
-
-    const newItem = this.createItemElement(item.id, item.name, item.booked);
-    this.container.appendChild(newItem);
-  }
-
   createItemElement(id, name, booked) {
     const newItem = document.createElement("div");
     newItem.classList.add("item");
+    newItem.dataset.id = id; // Add a data attribute to store the id
 
     const itemProps = document.createElement("div");
     itemProps.classList.add("item-props");
@@ -59,23 +43,19 @@ class ItemManager {
 
     const itemState = document.createElement("div");
     itemState.classList.add("item-state");
-    itemState.textContent = booked;
+    itemState.textContent = `Booked: ${booked}`;
 
     const itemDate = document.createElement("div");
-    itemDate.textContent = "undefined";
+    itemDate.textContent = "-";
 
     const itemUpdate = document.createElement("div");
-    itemUpdate.textContent = "undefined";
+    itemUpdate.textContent = "-";
 
     const deleteBtn = document.createElement("button");
     deleteBtn.classList.add("delete");
     deleteBtn.textContent = "-";
     deleteBtn.onclick = () => {
-      let youSure = confirm("Are you sure you want to delete this item?");
-
-      if (!youSure) {
-        return;
-      } else {
+      if (confirm("Are you sure you want to delete this item?")) {
         this.removeItem(newItem, id);
       }
     };
@@ -93,40 +73,69 @@ class ItemManager {
     return newItem;
   }
 
-  removeItem(item, itemId) {
+  addItem() {
+    const itemName = prompt("Enter item name");
+
+    if (itemName === null || itemName.trim() === "") {
+      alert("Item name cannot be empty");
+      return;
+    }
+
+    this.idCounter++;
+    const item = {
+      id: this.idCounter,
+      name: itemName,
+      booked: false,
+    };
+
+    this.items[this.idCounter] = item;
+    window.localStorage.setItem(`item ${item.id}`, JSON.stringify(item));
+
+    const newItem = this.createItemElement(item.id, item.name, item.booked);
+    this.container.appendChild(newItem);
+    reload();
+  }
+
+  removeItem(itemElement, itemId) {
     delete this.items[itemId];
-    this.container.removeChild(item);
+    this.container.removeChild(itemElement);
+    window.localStorage.removeItem(`item ${itemId}`);
     this.updateItemIds();
   }
 
   updateItemIds() {
-    const remainingItems = this.container.getElementsByClassName("item");
-    let newId = 1;
-    this.items = {};
+    const remainingItems = Array.from(this.container.querySelectorAll(".item"));
+    this.items = {}; // Reset items object
 
-    for (let remainingItem of remainingItems) {
-      const itemName = remainingItem.querySelector(".item-name").textContent;
-      const formattedId = this.formatId(newId);
+    remainingItems.forEach((itemElement, index) => {
+      const newId = index + 1; // New sequential ID starting from 1
+      const oldId = parseInt(itemElement.dataset.id, 10); // Get old ID
+      const itemName = itemElement.querySelector(".item-name").textContent;
+      const itemBooked = itemElement
+        .querySelector(".item-state")
+        .textContent.includes("Booked: true");
 
-      remainingItem.querySelector(".item-id").textContent = `${formattedId}`;
-      remainingItem.dataset.id = newId;
+      // Update item with new ID
+      itemElement.dataset.id = newId;
+      itemElement.querySelector(".item-id").textContent = this.formatId(newId);
 
-      const deleteBtn = remainingItem.querySelector(".delete");
-      deleteBtn.onclick = () => {
-        let youSure = confirm("Are you sure you want to delete this item?");
-
-        if (!youSure) {
-          return;
-        } else {
-          this.removeItem(remainingItem, newId);
-        }
+      // Store the updated item in the items object
+      this.items[newId] = {
+        id: newId,
+        name: itemName,
+        booked: itemBooked,
       };
 
-      this.items[newId] = { id: newId, name: itemName };
-      newId++;
-    }
+      // Update localStorage with new ID
+      window.localStorage.removeItem(`item ${oldId}`);
+      window.localStorage.setItem(
+        `item ${newId}`,
+        JSON.stringify(this.items[newId])
+      );
+    });
 
-    this.idCounter = newId - 1;
+    // Update idCounter
+    this.idCounter = remainingItems.length;
   }
 
   search() {
@@ -176,6 +185,19 @@ class ItemManager {
       if (!item.contains(document.getElementById("addItemButton"))) {
         this.container.removeChild(item);
       }
+    });
+  }
+
+  loadItemsFromLocalStorage() {
+    const storedItems = Object.keys(window.localStorage)
+      .filter((key) => key.startsWith("item "))
+      .map((key) => JSON.parse(window.localStorage.getItem(key)));
+
+    storedItems.forEach((item) => {
+      this.items[item.id] = item;
+      const newItem = this.createItemElement(item.id, item.name, item.booked);
+      this.container.appendChild(newItem);
+      this.idCounter = Math.max(this.idCounter, item.id); // Update idCounter
     });
   }
 }
